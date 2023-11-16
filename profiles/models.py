@@ -18,6 +18,31 @@ class Profile(models.Model):
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
 
+    def get_friends(self):
+        return self.friends.all()
+    def get_friends_no(self):
+        return self.friends.all().count()
+
+    def get_post_no(self):
+        return self.posts.all().count()
+    def get_all_authors_posts(self):
+        return self.posts.all()
+
+    def get_likes_given_no(self):
+        likes=self.like_set.all()
+        total_liked=0
+        for item in likes:
+            if item.value=='Like':
+                total_liked+=1
+            return total_liked
+
+    def get_likes_recived_no(self):
+        posts=self.posts.all()
+        total_liked=0
+        for item in posts:
+            total_liked+=item.Liked.all().count()
+        return total_liked
+
     def __str__(self):
         return f"{self.user.username}-{self.created.strftime('%d-%m-%Y)}')}"
 
