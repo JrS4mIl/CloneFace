@@ -65,6 +65,10 @@ STATUS_CHOICES = (
     ('accepted', 'accepted')
 )
 
+class RealationshipManager(models.Manager):
+    def invatations_recived(self,reciver):
+        qs=Relationship.objects.filter(revicer=reciver,status="send")
+        return qs
 
 class Relationship(models.Model):
     sender = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='sender')
@@ -72,6 +76,8 @@ class Relationship(models.Model):
     status = models.CharField(max_length=8, choices=STATUS_CHOICES)
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
+
+    objects=RealationshipManager()
 
     def __str__(self):
         return f'{self.sender}-{self.revicer}-{self.status}'

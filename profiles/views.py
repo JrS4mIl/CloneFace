@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import Profile
+from .models import Profile,Relationship
 from .forms import ProfileModelForm
 
 # Create your views here.
@@ -27,3 +27,12 @@ def my_profile_view(request):
         'confirm':confirm,
     }
     return render(request, 'myprofile.html', context)
+
+def invities_recived_view(request):
+    profile=Profile.objects.get(user=request.user)
+    qs=Relationship.objects.invatations_recived(profile)
+
+    context={
+        'qs':qs
+    }
+    return render(request,'my_invities.html',context)
