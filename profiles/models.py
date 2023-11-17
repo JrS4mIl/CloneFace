@@ -2,9 +2,29 @@ from django.db import models
 from django.contrib.auth.models import User
 from .utils import get_random_code
 from django.template.defaultfilters import slugify
-
+from django.db.models import Q
 
 # Create your models here.
+class ProfileManager(models.Manager):
+    def get_all_to_invate(self,sender):
+        profiles=Profile.objects.all().exclude(user=sender)
+        profile=Profile.objects.get(user=sender)
+        qs=Relationship.objects.filter(Q(sender=profile)|Q(revicer=profile))
+        print("qs:",qs)
+
+        accepted=set([])
+        for rel in qs:
+            if rel.status=='accepted':
+                accepted.add(rel.revicer)
+                accepted.add(rel.sender)
+        print(accepted)
+
+        avaiable=[profile for profile in profiles if profile not in accepted]
+        return avaiable
+
+    def get_all_profiles(self,me):
+        profiles=Profile.objects.all().exclude(user=me)
+        return profiles
 class Profile(models.Model):
     first_name = models.CharField(max_length=100, blank=True)
     last_name = models.CharField(max_length=100, blank=True)
@@ -17,7 +37,7 @@ class Profile(models.Model):
     slug = models.SlugField(unique=True, blank=True)
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
-
+    objects=ProfileManager()
     def get_friends(self):
         return self.friends.all()
     def get_friends_no(self):
